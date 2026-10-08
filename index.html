@@ -1,0 +1,691 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Oranla Robo Danışman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Düzen: solda profil anketi, sağda sonuç. Dar ekranda alt alta. Vurgu tek yerde: profil adı ve dağılım halkası. */
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --surface2: #E3E8EE;
+  --ink: #14212B;
+  --muted: #52606D;
+  --line: #CBD3DC;
+  --accent: #0B5F6B;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #D3EBEE;
+  --good: #2E7D4F;
+  --bad: #B5472F;
+  --c-mevduat: #3F5F8F;
+  --c-ppf: #1F8A8A;
+  --c-borc: #7FA6D6;
+  --c-hisse: #3E8E4F;
+  --c-altin: #C28A12;
+  --c-gumus: #8A949E;
+  --c-doviz: #8A5A9E;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1519; --surface: #142027; --surface2: #1B2A33; --ink: #E6EEF2; --muted: #9AAAB5; --line: #2A3B46;
+    --accent: #5CC4CF; --accent-ink: #06262B; --accent-soft: #143A40; --good: #6CC27C; --bad: #E08A72;
+    --c-mevduat: #7D9FD1; --c-ppf: #4FC0BE; --c-borc: #9CBDE6; --c-hisse: #6CC27C; --c-altin: #E0A82E; --c-gumus: #AEB8C1; --c-doviz: #BE8FD0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1519; --surface: #142027; --surface2: #1B2A33; --ink: #E6EEF2; --muted: #9AAAB5; --line: #2A3B46;
+  --accent: #5CC4CF; --accent-ink: #06262B; --accent-soft: #143A40; --good: #6CC27C; --bad: #E08A72;
+  --c-mevduat: #7D9FD1; --c-ppf: #4FC0BE; --c-borc: #9CBDE6; --c-hisse: #6CC27C; --c-altin: #E0A82E; --c-gumus: #AEB8C1; --c-doviz: #BE8FD0;
+  color-scheme: dark;
+}
+
+/* Renk paletleri: varsayılan turkuaz kök tanımda, diğerleri yalnızca vurgu tokenlarını değiştirir */
+:root[data-palette="indigo"] { --accent: #3B4BA8; --accent-ink: #FFFFFF; --accent-soft: #DDE1F6; }
+:root[data-palette="rose"] { --accent: #A8325A; --accent-ink: #FFFFFF; --accent-soft: #F6DCE5; }
+:root[data-palette="graphite"] { --accent: #2F3B46; --accent-ink: #FFFFFF; --accent-soft: #DCE1E6; }
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="indigo"]:not([data-theme="light"]) { --accent: #9AA6F0; --accent-ink: #10163A; --accent-soft: #232A57; }
+  :root[data-palette="rose"]:not([data-theme="light"]) { --accent: #EE8BAE; --accent-ink: #3A0F20; --accent-soft: #4A1F31; }
+  :root[data-palette="graphite"]:not([data-theme="light"]) { --accent: #C3CED8; --accent-ink: #11191F; --accent-soft: #2B3943; }
+}
+:root[data-palette="indigo"][data-theme="dark"] { --accent: #9AA6F0; --accent-ink: #10163A; --accent-soft: #232A57; }
+:root[data-palette="rose"][data-theme="dark"] { --accent: #EE8BAE; --accent-ink: #3A0F20; --accent-soft: #4A1F31; }
+:root[data-palette="graphite"][data-theme="dark"] { --accent: #C3CED8; --accent-ink: #11191F; --accent-soft: #2B3943; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 24px 48px; }
+.app { max-width: 1120px; margin-inline: auto; display: flex; flex-direction: column; gap: 24px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+.toprow { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.top { display: flex; flex-direction: column; gap: 8px; max-width: 62ch; min-width: 0; }
+.kicker { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.top h1 { font-size: clamp(26px, 4.2vw, 40px); font-weight: 800; line-height: 1.1; letter-spacing: -.01em; }
+.top p { color: var(--muted); }
+
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 3px; gap: 2px; flex: none; }
+.lang button { font-family: var(--f-mono); font-size: 13px; font-weight: 500; letter-spacing: .06em; border: 0; background: transparent; color: var(--muted); padding: 6px 14px; border-radius: 5px; cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.lang button:not([aria-pressed="true"]):hover { color: var(--ink); }
+.lang button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; }
+.swatches { display: inline-flex; gap: 10px; align-items: center; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.sw { width: 22px; height: 22px; border-radius: 50%; border: 0; padding: 0; background: var(--sw); cursor: pointer; }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.sw:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.panel h2 { font-size: 20px; font-weight: 600; }
+.stack { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+.money { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 420px) { .money { grid-template-columns: minmax(0, 1fr); } }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label, legend { font-weight: 600; font-size: 14px; }
+.inp { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding-inline: 10px; }
+.inp:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.inp input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--f-mono); font-size: 15px; padding-block: 9px; outline: none; }
+.inp span { color: var(--muted); font-family: var(--f-mono); }
+
+fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+legend { padding: 0; margin-bottom: 8px; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 420px) { .opts { grid-template-columns: minmax(0, 1fr); } }
+.opt { position: relative; display: block; min-width: 0; }
+.opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt span { display: block; height: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 14px; line-height: 1.35; background: var(--bg); }
+.opt input:checked + span { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.opt input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.opt:hover span { border-color: var(--accent); }
+
+/* Profil kartı */
+.profile { display: flex; flex-direction: column; gap: 14px; }
+.profile .lbl { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.pname { font-family: var(--f-display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: 1; letter-spacing: -.02em; color: var(--accent); }
+.ptext { max-width: 62ch; color: var(--ink); }
+.scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.scale i { height: 8px; border-radius: 2px; background: var(--surface2); }
+.scale i.on { background: var(--accent); }
+.scale-cap { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-family: var(--f-mono); }
+
+/* Dağılım */
+.alloc { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: center; }
+@media (max-width: 640px) { .alloc { grid-template-columns: minmax(0, 1fr); justify-items: center; } .alloc ul { width: 100%; } }
+.donut { width: 220px; max-width: 100%; height: auto; }
+.donut text { fill: var(--ink); }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; width: 100%; }
+.row { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; gap: 4px 12px; align-items: baseline; padding-block: 10px; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.dot { width: 12px; height: 12px; border-radius: 2px; align-self: center; }
+.rname b { font-weight: 600; display: block; }
+.rname small { color: var(--muted); font-size: 13px; line-height: 1.35; display: block; }
+.rpct { font-family: var(--f-mono); font-weight: 500; text-align: right; min-width: 3.4em; }
+.ramt { font-family: var(--f-mono); color: var(--muted); text-align: right; min-width: 8em; font-size: 14px; }
+.row.zero { opacity: .55; }
+@media (max-width: 420px) { .row { grid-template-columns: 12px minmax(0, 1fr) auto; } .ramt { grid-column: 2 / 4; text-align: left; min-width: 0; } }
+.adjust { background: var(--accent-soft); border-radius: 6px; padding: 10px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.adjust:empty { display: none; }
+
+/* Projeksiyon */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+.kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kpi .k { color: var(--muted); font-size: 13px; }
+.kpi .v { font-family: var(--f-mono); font-size: 20px; font-weight: 500; overflow-wrap: anywhere; }
+.kpi .s { color: var(--muted); font-size: 12px; font-family: var(--f-mono); }
+#chart { width: 100%; min-width: 0; }
+#chart svg { display: block; }
+.note { color: var(--muted); font-size: 13px; }
+
+/* Varsayımlar */
+details { border-top: 1px solid var(--line); padding-top: 14px; }
+summary { cursor: pointer; font-weight: 600; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.assump { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+.arow { display: grid; grid-template-columns: minmax(0, 1fr) 96px 96px; gap: 8px 10px; align-items: center; }
+.arow.head { font-size: 12px; color: var(--muted); font-family: var(--f-mono); }
+.arow .nm { font-size: 14px; }
+.arow .inp { padding-inline: 8px; }
+.arow .inp input { padding-block: 6px; font-size: 14px; }
+@media (max-width: 420px) { .arow { grid-template-columns: minmax(0, 1fr) 80px 80px; } }
+
+.disclaimer { font-size: 13px; color: var(--muted); max-width: 90ch; border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .donut circle { transition: stroke-dasharray .35s ease, stroke-dashoffset .35s ease; }
+}
+</style>
+
+<div class="app" id="app" lang="tr">
+  <div class="toprow">
+    <header class="top">
+      <span class="kicker" data-i18n="kicker"></span>
+      <h1 data-i18n="h1"></h1>
+      <p data-i18n="lead"></p>
+    </header>
+    <div class="tools">
+      <div class="swatches" role="group" data-i18n-aria="palAria">
+        <button type="button" class="sw" data-p="teal" style="--sw:#1F8A98" data-i18n-aria="pal_teal"></button>
+        <button type="button" class="sw" data-p="indigo" style="--sw:#5565D0" data-i18n-aria="pal_indigo"></button>
+        <button type="button" class="sw" data-p="rose" style="--sw:#D0507F" data-i18n-aria="pal_rose"></button>
+        <button type="button" class="sw" data-p="graphite" style="--sw:#5C6B78" data-i18n-aria="pal_graphite"></button>
+      </div>
+      <div class="lang" role="group" data-i18n-aria="modeAria">
+        <button type="button" id="mode-light" aria-pressed="false" data-i18n="modeLight"></button>
+        <button type="button" id="mode-dark" aria-pressed="false" data-i18n="modeDark"></button>
+      </div>
+      <div class="lang" role="group" aria-label="Dil / Language">
+        <button type="button" id="lang-tr" aria-pressed="true" lang="tr">Türkçe</button>
+        <button type="button" id="lang-en" aria-pressed="false" lang="en">English</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <form class="panel" id="form" onsubmit="return false">
+      <h2 data-i18n="formTitle"></h2>
+      <div class="money">
+        <div class="field">
+          <label for="amount" data-i18n="amount"></label>
+          <div class="inp"><input id="amount" type="number" inputmode="numeric" min="0" step="1000" value="250000"><span>₺</span></div>
+        </div>
+        <div class="field">
+          <label for="monthly" data-i18n="monthly"></label>
+          <div class="inp"><input id="monthly" type="number" inputmode="numeric" min="0" step="500" value="5000"><span>₺</span></div>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend data-i18n="q1l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q1" value="4"><span data-i18n="q1o1"></span></label>
+          <label class="opt"><input type="radio" name="q1" value="3" checked><span data-i18n="q1o2"></span></label>
+          <label class="opt"><input type="radio" name="q1" value="2"><span data-i18n="q1o3"></span></label>
+          <label class="opt"><input type="radio" name="q1" value="1"><span data-i18n="q1o4"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="q2l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q2" value="1"><span data-i18n="q2o1"></span></label>
+          <label class="opt"><input type="radio" name="q2" value="2"><span data-i18n="q2o2"></span></label>
+          <label class="opt"><input type="radio" name="q2" value="3" checked><span data-i18n="q2o3"></span></label>
+          <label class="opt"><input type="radio" name="q2" value="4"><span data-i18n="q2o4"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="q3l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q3" value="1"><span data-i18n="q3o1"></span></label>
+          <label class="opt"><input type="radio" name="q3" value="2"><span data-i18n="q3o2"></span></label>
+          <label class="opt"><input type="radio" name="q3" value="3" checked><span data-i18n="q3o3"></span></label>
+          <label class="opt"><input type="radio" name="q3" value="4"><span data-i18n="q3o4"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="q4l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q4" value="1"><span data-i18n="q4o1"></span></label>
+          <label class="opt"><input type="radio" name="q4" value="2"><span data-i18n="q4o2"></span></label>
+          <label class="opt"><input type="radio" name="q4" value="3" checked><span data-i18n="q4o3"></span></label>
+          <label class="opt"><input type="radio" name="q4" value="4"><span data-i18n="q4o4"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="q5l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q5" value="1"><span data-i18n="q5o1"></span></label>
+          <label class="opt"><input type="radio" name="q5" value="2"><span data-i18n="q5o2"></span></label>
+          <label class="opt"><input type="radio" name="q5" value="3" checked><span data-i18n="q5o3"></span></label>
+          <label class="opt"><input type="radio" name="q5" value="4"><span data-i18n="q5o4"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="q6l"></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="q6" value="1"><span data-i18n="q6o1"></span></label>
+          <label class="opt"><input type="radio" name="q6" value="2" checked><span data-i18n="q6o2"></span></label>
+          <label class="opt"><input type="radio" name="q6" value="3"><span data-i18n="q6o3"></span></label>
+          <label class="opt"><input type="radio" name="q6" value="4"><span data-i18n="q6o4"></span></label>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="stack">
+      <section class="panel" aria-live="polite">
+        <div class="profile">
+          <span class="lbl" id="plabel"></span>
+          <div class="pname" id="pname"></div>
+          <div class="scale" id="scale" aria-hidden="true"></div>
+          <div class="scale-cap"><span data-i18n="scaleLow"></span><span data-i18n="scaleHigh"></span></div>
+          <p class="ptext" id="ptext"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="allocTitle"></h2>
+        <div class="alloc">
+          <svg class="donut" id="donut" viewBox="0 0 220 220" role="img"></svg>
+          <ul class="list" id="alloc"></ul>
+        </div>
+        <div class="adjust" id="adjust"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="projTitle"></h2>
+        <div class="kpis" id="kpis"></div>
+        <div id="chart"></div>
+        <p class="note" data-i18n="chartNote"></p>
+        <details>
+          <summary data-i18n="assumpSummary"></summary>
+          <div class="assump" id="assump"></div>
+          <p class="note" style="margin-top:12px" data-i18n="assumpNote"></p>
+        </details>
+      </section>
+    </div>
+  </div>
+
+  <p class="disclaimer" data-i18n="disclaimer"></p>
+</div>
+
+<script>
+(function () {
+  var T = {
+    tr: {
+      kicker: 'Oranla · Robo danışman',
+      palAria: 'Renk seçimi', pal_teal: 'Turkuaz', pal_indigo: 'İndigo', pal_rose: 'Gül', pal_graphite: 'Grafit',
+      modeAria: 'Tema', modeLight: 'Açık', modeDark: 'Koyu',
+      h1: 'Risk profilinize uygun portföy dağılımı',
+      lead: 'Altın, gümüş, mevduat ve fonlar arasında paylaştırma önerisi alın. Cevaplarınızı değiştirdikçe dağılım ve getiri senaryoları anında güncellenir.',
+      formTitle: 'Sizi tanıyalım',
+      amount: 'Yatırılacak tutar',
+      monthly: 'Aylık ek yatırım',
+      q1l: 'Yaş aralığınız', q1o1: '18–30', q1o2: '31–45', q1o3: '46–60', q1o4: '60 üzeri',
+      q2l: 'Parayı ne kadar süre yatırımda tutarsınız?', q2o1: '1 yıl', q2o2: '3 yıl', q2o3: '5 yıl', q2o4: '10 yıl',
+      q3l: 'Portföyünüz kısa sürede %20 değer kaybederse ne yaparsınız?', q3o1: 'Hepsini satarım', q3o2: 'Bir kısmını satarım', q3o3: 'Beklerim', q3o4: 'Fırsat görüp eklerim',
+      q4l: 'Asıl hedefiniz nedir?', q4o1: 'Parayı korumak', q4o2: 'Enflasyonu geçmek', q4o3: 'Dengeli büyüme', q4o4: 'Yüksek getiri',
+      q5l: 'Acil durum birikiminiz var mı?', q5o1: 'Yok, gelirim düzensiz', q5o2: 'Az, 1–2 aylık', q5o3: '3–6 aylık', q5o4: '6 aydan fazla',
+      q6l: 'Yatırım deneyiminiz', q6o1: 'Hiç yok', q6o2: 'Mevduat, altın', q6o3: 'Yatırım fonları', q6o4: 'Hisse ve fon',
+      scaleLow: 'Temkinli', scaleHigh: 'Atak',
+      allocTitle: 'Önerilen dağılım',
+      donutAria: 'Önerilen portföy dağılımı',
+      total: 'Toplam',
+      chartNote: 'Kötü ve iyi senaryo, her varlığın aynı anda ortalamanın bir oynaklık payı altında ya da üstünde gitmesini varsayar. Gerçekte varlıklar aynı yönde hareket etmediği için aralık bundan dar olur. Tutarlar vergi ve komisyon öncesi, nominal TL cinsindendir.',
+      assumpSummary: 'Getiri varsayımlarını düzenle',
+      assumpNote: 'Buradaki yıllık getiri ve oynaklık değerleri örnek varsayımdır, tahmin değildir. Güncel mevduat faizinizi ve fonların geçmiş getirilerini girerek kendi senaryonuzu görün.',
+      disclaimer: 'Bu araç genel bilgilendirme ve eğitim amaçlıdır, yatırım danışmanlığı değildir. Yatırım danışmanlığı hizmeti yetkili kuruluşlarca kişiye özel verilir. Burada gösterilen dağılımlar ve senaryolar getiri garantisi taşımaz. Geçmiş performans gelecekteki sonuçların göstergesi değildir. Karar vermeden önce fon izahnamelerini ve ürün koşullarını inceleyin.',
+      assetHead: 'Varlık', retHead: 'Getiri %/yıl', volHead: 'Oynaklık %', inflation: 'Yıllık enflasyon',
+      retAria: 'yıllık getiri', volAria: 'oynaklık', infAria: 'Yıllık enflasyon',
+      plabel: function (n) { return 'Risk profiliniz · ' + n + ' / 5'; },
+      projTitle: function (y) { return y + ' yıllık getiri senaryoları'; },
+      kExpected: 'Beklenen değer', kAvg: function (p) { return 'Yıllık ort. %' + p; },
+      kReal: 'Bugünkü alım gücüyle', kInf: function (p) { return '%' + p + ' enflasyonla'; },
+      kRange: 'Kötü – iyi aralığı', kInvested: 'Toplam yatırılan',
+      chartAria: 'Kötü, beklenen ve iyi senaryoda portföy değeri',
+      cToday: 'Bugün', cYear: function (y) { return y + '. yıl'; }, cGood: 'İyi', cBase: 'Beklenen', cBad: 'Kötü', cPrin: 'Yatırılan',
+      note1: function (p) { return '1 yıllık vadede hisse ve gümüş payı (%' + p + ') para piyasası fonuna aktarıldı. Kısa sürede değer kaybı yaşama ihtimali yüksek olduğu için.'; },
+      note2: function (p) { return 'Acil durum birikiminiz olmadığı için riskli varlıklardan %' + p + ' para piyasası fonuna aktarıldı. Bu pay ihtiyaç anında hızlı nakde çevrilebilir.'; },
+      pct: function (n) { return '%' + n; },
+      mn: 'Mn ₺', th: 'B ₺'
+    },
+    en: {
+      kicker: 'Oranla · Robo advisor',
+      palAria: 'Color', pal_teal: 'Teal', pal_indigo: 'Indigo', pal_rose: 'Rose', pal_graphite: 'Graphite',
+      modeAria: 'Theme', modeLight: 'Light', modeDark: 'Dark',
+      h1: 'A portfolio mix that fits your risk profile',
+      lead: 'Get a suggested split across gold, silver, deposits and funds. The allocation and return scenarios update instantly as you change your answers.',
+      formTitle: 'Let us get to know you',
+      amount: 'Amount to invest',
+      monthly: 'Monthly contribution',
+      q1l: 'Your age range', q1o1: '18–30', q1o2: '31–45', q1o3: '46–60', q1o4: 'Over 60',
+      q2l: 'How long will you keep the money invested?', q2o1: '1 year', q2o2: '3 years', q2o3: '5 years', q2o4: '10 years',
+      q3l: 'If your portfolio drops 20% in a short time, what do you do?', q3o1: 'Sell everything', q3o2: 'Sell some', q3o3: 'Wait', q3o4: 'See a chance and add more',
+      q4l: 'What is your main goal?', q4o1: 'Protect my money', q4o2: 'Beat inflation', q4o3: 'Balanced growth', q4o4: 'High return',
+      q5l: 'Do you have an emergency fund?', q5o1: 'No, my income is irregular', q5o2: 'A little, 1–2 months', q5o3: '3–6 months', q5o4: 'More than 6 months',
+      q6l: 'Your investing experience', q6o1: 'None', q6o2: 'Deposits, gold', q6o3: 'Mutual funds', q6o4: 'Stocks and funds',
+      scaleLow: 'Cautious', scaleHigh: 'Aggressive',
+      allocTitle: 'Recommended allocation',
+      donutAria: 'Recommended portfolio allocation',
+      total: 'Total',
+      chartNote: 'The bad and good scenarios assume every asset ends one volatility step below or above its average at the same time. Real assets rarely move together, so the actual range is narrower. Amounts are nominal TRY, before tax and fees.',
+      assumpSummary: 'Edit return assumptions',
+      assumpNote: 'The annual return and volatility values here are example assumptions, not forecasts. Enter your current deposit rate and the funds’ past returns to see your own scenario.',
+      disclaimer: 'This tool is for general information and education, and is not investment advice. Personalized investment advice is provided by licensed institutions. The allocations and scenarios shown carry no return guarantee. Past performance does not indicate future results. Read fund prospectuses and product terms before deciding.',
+      assetHead: 'Asset', retHead: 'Return %/yr', volHead: 'Volatility %', inflation: 'Annual inflation',
+      retAria: 'annual return', volAria: 'volatility', infAria: 'Annual inflation',
+      plabel: function (n) { return 'Your risk profile · ' + n + ' / 5'; },
+      projTitle: function (y) { return y + '-year return scenarios'; },
+      kExpected: 'Expected value', kAvg: function (p) { return 'Avg. ' + p + '% per year'; },
+      kReal: 'In today’s purchasing power', kInf: function (p) { return 'at ' + p + '% inflation'; },
+      kRange: 'Bad – good range', kInvested: 'Total invested',
+      chartAria: 'Portfolio value in the bad, expected and good scenarios',
+      cToday: 'Today', cYear: function (y) { return 'Year ' + y; }, cGood: 'Good', cBase: 'Expected', cBad: 'Bad', cPrin: 'Invested',
+      note1: function (p) { return 'With a 1-year horizon, the equity and silver share (' + p + '%) was moved to the money market fund, because short-term losses are more likely.'; },
+      note2: function (p) { return 'You have no emergency fund, so ' + p + '% was moved from risky assets to the money market fund. That share can be turned into cash quickly when you need it.'; },
+      pct: function (n) { return n + '%'; },
+      mn: 'M ₺', th: 'K ₺'
+    }
+  };
+
+  var ASSETS = [
+    { id: 'mevduat', ret: 38, vol: 1,
+      name: { tr: 'Vadeli mevduat', en: 'Term deposit' },
+      via: { tr: 'TL vadeli hesap', en: 'TRY time deposit account' },
+      role: { tr: 'Vade sonunda bilinen getiri, çok düşük dalgalanma', en: 'Known return at maturity, very low volatility' } },
+    { id: 'ppf', ret: 40, vol: 1,
+      name: { tr: 'Para piyasası fonu', en: 'Money market fund' },
+      via: { tr: 'TEFAS üzerinden fon', en: 'Fund via TEFAS' },
+      role: { tr: 'Günlük çıkış imkânı, düşük dalgalanma', en: 'Daily redemption, low volatility' } },
+    { id: 'borc', ret: 42, vol: 6,
+      name: { tr: 'Borçlanma araçları fonu', en: 'Debt instruments fund' },
+      via: { tr: 'Tahvil ve bono fonu', en: 'Bond and bill fund' },
+      role: { tr: 'Faiz değişimine duyarlı, orta dalgalanma', en: 'Sensitive to interest rate changes, medium volatility' } },
+    { id: 'hisse', ret: 55, vol: 30,
+      name: { tr: 'Hisse senedi fonu', en: 'Equity fund' },
+      via: { tr: 'Borsa İstanbul hisse fonu', en: 'Borsa Istanbul equity fund' },
+      role: { tr: 'Uzun vadede büyüme, yüksek dalgalanma', en: 'Long-term growth, high volatility' } },
+    { id: 'altin', ret: 45, vol: 18,
+      name: { tr: 'Altın', en: 'Gold' },
+      via: { tr: 'Gram altın veya altın fonu', en: 'Gram gold or gold fund' },
+      role: { tr: 'Enflasyona ve kur riskine karşı denge', en: 'Balance against inflation and currency risk' } },
+    { id: 'gumus', ret: 50, vol: 30,
+      name: { tr: 'Gümüş', en: 'Silver' },
+      via: { tr: 'Gümüş fonu veya gram gümüş', en: 'Silver fund or gram silver' },
+      role: { tr: 'Altından daha oynak, getirisi sanayi talebinden de etkilenir', en: 'More volatile than gold, also driven by industrial demand' } },
+    { id: 'doviz', ret: 25, vol: 12,
+      name: { tr: 'Döviz (USD/EUR)', en: 'Foreign currency (USD/EUR)' },
+      via: { tr: 'Döviz hesabı veya döviz fonu', en: 'FX account or FX fund' },
+      role: { tr: 'Kur hareketlerine karşı koruma', en: 'Protection against exchange rate moves' } }
+  ];
+  /* Ağırlık sırası ASSETS sırasıyla aynıdır */
+  var PROFILES = [
+    { w: [35, 30, 15, 0, 12, 0, 8],
+      name: { tr: 'Çok temkinli', en: 'Very cautious' },
+      text: { tr: 'Sermayeyi korumak önceliğiniz. Portföyün büyük bölümü mevduat ve para piyasası fonunda durur, altın ve döviz küçük bir denge payı olarak eklenir.',
+              en: 'Protecting your capital comes first. Most of the portfolio sits in deposits and the money market fund, with small gold and currency shares for balance.' } },
+    { w: [25, 25, 15, 8, 15, 2, 10],
+      name: { tr: 'Temkinli', en: 'Cautious' },
+      text: { tr: 'Düşük dalgalanma ister ama enflasyonun gerisinde kalmak istemezsiniz. Faiz getirili araçlar çoğunlukta, hisse ve gümüş çok küçük paylarla yer alır.',
+              en: 'You want low volatility but do not want to fall behind inflation. Interest-bearing assets lead, with equities and silver in very small shares.' } },
+    { w: [15, 15, 15, 20, 20, 5, 10],
+      name: { tr: 'Dengeli', en: 'Balanced' },
+      text: { tr: 'Orta vadede büyüme ile güvenlik arasında denge kurarsınız. Faiz getirili araçlar, altın ve hisse fonu yaklaşık eşit ağırlıkla portföyü taşır.',
+              en: 'You balance growth and safety over the medium term. Interest-bearing assets, gold and the equity fund carry the portfolio with roughly equal weight.' } },
+    { w: [8, 7, 10, 35, 20, 8, 12],
+      name: { tr: 'Büyüme odaklı', en: 'Growth-oriented' },
+      text: { tr: 'Daha yüksek getiri için dalgalanmayı kabul edersiniz. Hisse fonu portföyün ana motoru olur, altın ve gümüş çeşitlendirme sağlar.',
+              en: 'You accept volatility for higher returns. The equity fund becomes the main engine, while gold and silver add diversification.' } },
+    { w: [3, 2, 5, 50, 20, 10, 10],
+      name: { tr: 'Atak', en: 'Aggressive' },
+      text: { tr: 'Uzun vade ve yüksek risk toleransınız var. Portföyün yarısı hisse fonunda, geri kalanı değerli metaller ve döviz arasında dağılır. Geçici sert düşüşler beklenmelidir.',
+              en: 'You have a long horizon and high risk tolerance. Half the portfolio sits in the equity fund, the rest is split between precious metals and currency. Expect sharp temporary drops.' } }
+  ];
+  var YEARS = [1, 3, 5, 10];
+  var LOCALE = { tr: 'tr-TR', en: 'en-US' };
+  var lang = 'tr';
+  try { var saved = localStorage.getItem('oranla-lang'); if (saved === 'tr' || saved === 'en') lang = saved; } catch (e) {}
+
+  var $ = function (id) { return document.getElementById(id); };
+  var t = function (k) { return T[lang][k]; };
+  var nf0, nf1;
+  function setFormats() {
+    nf0 = new Intl.NumberFormat(LOCALE[lang], { maximumFractionDigits: 0 });
+    nf1 = new Intl.NumberFormat(LOCALE[lang], { maximumFractionDigits: 1 });
+  }
+  function money(v) { return nf0.format(Math.round(v)) + ' ₺'; }
+  function short(v) {
+    if (v >= 1e6) return nf1.format(v / 1e6) + ' ' + t('mn');
+    if (v >= 1e3) return nf0.format(Math.round(v / 1e3)) + ' ' + t('th');
+    return nf0.format(Math.round(v)) + ' ₺';
+  }
+  function num(id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+  function ans(q) { var el = document.querySelector('input[name=' + q + ']:checked'); return el ? parseInt(el.value, 10) : 1; }
+
+  /* Varsayım tablosu: bir kez kurulur, dil değişince yalnızca metinler güncellenir */
+  (function buildAssump() {
+    var h = '<div class="arow head"><span id="ah-asset"></span><span id="ah-ret"></span><span id="ah-vol"></span></div>';
+    ASSETS.forEach(function (a) {
+      h += '<div class="arow"><span class="nm" id="nm-' + a.id + '"></span>' +
+        '<div class="inp"><input id="ret-' + a.id + '" type="number" step="1" value="' + a.ret + '"></div>' +
+        '<div class="inp"><input id="vol-' + a.id + '" type="number" step="1" min="0" value="' + a.vol + '"></div></div>';
+    });
+    h += '<div class="arow"><span class="nm" id="nm-inf"></span><div class="inp"><input id="inf" type="number" step="1" value="30"></div><span></span></div>';
+    $('assump').innerHTML = h;
+  })();
+
+  function applyStatic() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+    $('app').setAttribute('lang', lang);
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      var v = t(el.getAttribute('data-i18n-aria'));
+      el.setAttribute('aria-label', v);
+      if (el.classList.contains('sw')) el.setAttribute('title', v);
+    });
+    $('donut').setAttribute('aria-label', t('donutAria'));
+    $('ah-asset').textContent = t('assetHead');
+    $('ah-ret').textContent = t('retHead');
+    $('ah-vol').textContent = t('volHead');
+    $('nm-inf').textContent = t('inflation');
+    $('inf').setAttribute('aria-label', t('infAria'));
+    ASSETS.forEach(function (a) {
+      var n = a.name[lang];
+      $('nm-' + a.id).textContent = n;
+      $('ret-' + a.id).setAttribute('aria-label', n + ' ' + t('retAria'));
+      $('vol-' + a.id).setAttribute('aria-label', n + ' ' + t('volAria'));
+    });
+    $('lang-tr').setAttribute('aria-pressed', lang === 'tr' ? 'true' : 'false');
+    $('lang-en').setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+  }
+
+  function setLang(l) {
+    lang = l;
+    try { localStorage.setItem('oranla-lang', l); } catch (e) {}
+    setFormats();
+    applyStatic();
+    update();
+  }
+
+  function move(w, froms, to, amt) {
+    var left = amt, moved = 0;
+    froms.forEach(function (i) {
+      var tk = Math.min(w[i], left);
+      w[i] -= tk; w[to] += tk; left -= tk; moved += tk;
+    });
+    return moved;
+  }
+
+  function compute() {
+    var score = 0;
+    ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'].forEach(function (q) { score += ans(q); });
+    var idx = score <= 9 ? 0 : score <= 13 ? 1 : score <= 17 ? 2 : score <= 21 ? 3 : 4;
+    var w = PROFILES[idx].w.slice();
+    var notes = [];
+    if (ans('q2') === 1) {
+      var m1 = move(w, [3, 5], 1, w[3] + w[5]);
+      if (m1 > 0) notes.push(T[lang].note1(m1));
+    }
+    if (ans('q5') === 1) {
+      var m2 = move(w, [3, 5], 1, 10);
+      if (m2 > 0) notes.push(T[lang].note2(m2));
+    }
+    return { score: score, idx: idx, w: w, notes: notes };
+  }
+
+  function renderProfile(r) {
+    var p = PROFILES[r.idx];
+    $('pname').textContent = p.name[lang];
+    $('ptext').textContent = p.text[lang];
+    var s = '';
+    for (var i = 0; i < 5; i++) s += '<i class="' + (i <= r.idx ? 'on' : '') + '"></i>';
+    $('scale').innerHTML = s;
+    $('plabel').textContent = T[lang].plabel(r.idx + 1);
+  }
+
+  function renderAlloc(r) {
+    var total = Math.max(0, num('amount'));
+    var rows = '';
+    ASSETS.forEach(function (a, i) {
+      var pct = r.w[i];
+      rows += '<li class="row' + (pct === 0 ? ' zero' : '') + '"><span class="dot" style="background:var(--c-' + a.id + ')"></span>' +
+        '<div class="rname"><b>' + a.name[lang] + '</b><small>' + a.via[lang] + '. ' + a.role[lang] + '.</small></div>' +
+        '<div class="rpct">' + T[lang].pct(pct) + '</div><div class="ramt">' + money(total * pct / 100) + '</div></li>';
+    });
+    $('alloc').innerHTML = rows;
+
+    var R = 76, C = 2 * Math.PI * R, off = 0, svg = '';
+    svg += '<circle cx="110" cy="110" r="' + R + '" fill="none" stroke="var(--surface2)" stroke-width="30"></circle>';
+    ASSETS.forEach(function (a, i) {
+      var pct = r.w[i];
+      if (!pct) return;
+      var len = C * pct / 100;
+      var gap = pct === 100 ? 0 : 2;
+      svg += '<circle cx="110" cy="110" r="' + R + '" fill="none" stroke="var(--c-' + a.id + ')" stroke-width="30" ' +
+        'stroke-dasharray="' + Math.max(len - gap, 0.5) + ' ' + (C - Math.max(len - gap, 0.5)) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 110 110)"></circle>';
+      off += len;
+    });
+    svg += '<text x="110" y="106" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" style="fill:var(--muted)">' + t('total') + '</text>';
+    svg += '<text x="110" y="128" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500">' + short(total) + '</text>';
+    $('donut').innerHTML = svg;
+
+    $('adjust').innerHTML = r.notes.map(function (n) { return '<span>' + n + '</span>'; }).join('');
+  }
+
+  function series(rate, months, P, C) {
+    rate = Math.max(rate, -0.95);
+    var mr = Math.pow(1 + rate, 1 / 12) - 1, v = P, out = [v];
+    for (var i = 1; i <= months; i++) { v = v * (1 + mr) + C; out.push(v); }
+    return out;
+  }
+  function niceStep(raw) {
+    var p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), f = raw / p;
+    var n = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+    return n * p;
+  }
+
+  var last = null;
+  function renderProj(r) {
+    var Y = YEARS[ans('q2') - 1], months = Y * 12;
+    var P = Math.max(0, num('amount')), Cm = Math.max(0, num('monthly'));
+    var base = 0, bad = 0, good = 0;
+    ASSETS.forEach(function (a, i) {
+      var w = r.w[i] / 100, ret = num('ret-' + a.id) / 100, vol = Math.max(0, num('vol-' + a.id)) / 100;
+      base += w * ret; bad += w * (ret - vol); good += w * (ret + vol);
+    });
+    var sBase = series(base, months, P, Cm), sBad = series(bad, months, P, Cm), sGood = series(good, months, P, Cm);
+    var sPrin = []; for (var i = 0; i <= months; i++) sPrin.push(P + Cm * i);
+    var inf = num('inf') / 100;
+    var real = sBase[months] / Math.pow(1 + inf, Y);
+    $('projTitle').textContent = T[lang].projTitle(Y);
+    $('kpis').innerHTML =
+      '<div class="kpi"><span class="k">' + t('kExpected') + '</span><span class="v">' + money(sBase[months]) + '</span><span class="s">' + T[lang].kAvg(nf1.format(base * 100)) + '</span></div>' +
+      '<div class="kpi"><span class="k">' + t('kReal') + '</span><span class="v">' + money(real) + '</span><span class="s">' + T[lang].kInf(nf1.format(inf * 100)) + '</span></div>' +
+      '<div class="kpi"><span class="k">' + t('kRange') + '</span><span class="v">' + short(sBad[months]) + ' – ' + short(sGood[months]) + '</span><span class="s">' + t('kInvested') + ' ' + short(sPrin[months]) + '</span></div>';
+    last = { Y: Y, months: months, sBase: sBase, sBad: sBad, sGood: sGood, sPrin: sPrin };
+    drawChart();
+  }
+
+  function drawChart() {
+    if (!last) return;
+    var d = last, box = $('chart');
+    var W = Math.max(280, box.clientWidth || 600), H = 290;
+    var m = { l: 62, r: 78, t: 12, b: 28 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var maxV = Math.max(d.sGood[d.months], d.sBase[d.months], d.sPrin[d.months], 1);
+    var step = niceStep(maxV / 4), top = Math.ceil(maxV / step) * step;
+    var X = function (mo) { return m.l + pw * mo / d.months; };
+    var Yy = function (v) { return m.t + ph * (1 - v / top); };
+    var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + t('chartAria') + '">';
+    for (var v = 0; v <= top + 1e-6; v += step) {
+      s += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Yy(v) + '" y2="' + Yy(v) + '" style="stroke:var(--line)" stroke-width="1"/>';
+      s += '<text x="' + (m.l - 8) + '" y="' + (Yy(v) + 4) + '" text-anchor="end" font-size="11" font-family="IBM Plex Mono, monospace" style="fill:var(--muted)">' + short(v) + '</text>';
+    }
+    var xs = d.Y <= 5 ? 1 : 2;
+    for (var y = 0; y <= d.Y; y += xs) {
+      s += '<text x="' + X(y * 12) + '" y="' + (H - 8) + '" text-anchor="' + (y === 0 ? 'start' : y === d.Y ? 'end' : 'middle') + '" font-size="11" font-family="IBM Plex Mono, monospace" style="fill:var(--muted)">' + (y === 0 ? t('cToday') : T[lang].cYear(y)) + '</text>';
+    }
+    var path = function (arr) { return arr.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Yy(v).toFixed(1); }).join(''); };
+    var rev = ''; for (var i = d.months; i >= 0; i--) rev += 'L' + X(i).toFixed(1) + ' ' + Yy(d.sBad[i]).toFixed(1);
+    s += '<path d="' + path(d.sGood) + rev + 'Z" style="fill:var(--accent)" fill-opacity=".10" stroke="none"/>';
+    s += '<path d="' + path(d.sPrin) + '" fill="none" style="stroke:var(--muted)" stroke-width="1.5" stroke-dasharray="2 4"/>';
+    s += '<path d="' + path(d.sBad) + '" fill="none" style="stroke:var(--bad)" stroke-width="1.75" stroke-dasharray="6 4"/>';
+    s += '<path d="' + path(d.sGood) + '" fill="none" style="stroke:var(--good)" stroke-width="1.75" stroke-dasharray="6 4"/>';
+    s += '<path d="' + path(d.sBase) + '" fill="none" style="stroke:var(--accent)" stroke-width="3" stroke-linejoin="round"/>';
+    s += '<circle cx="' + X(d.months) + '" cy="' + Yy(d.sBase[d.months]) + '" r="4.5" style="fill:var(--accent)"/>';
+    var labs = [
+      { t: t('cGood'), y: Yy(d.sGood[d.months]), c: 'var(--good)' },
+      { t: t('cBase'), y: Yy(d.sBase[d.months]), c: 'var(--accent)' },
+      { t: t('cBad'), y: Yy(d.sBad[d.months]), c: 'var(--bad)' },
+      { t: t('cPrin'), y: Yy(d.sPrin[d.months]), c: 'var(--muted)' }
+    ].sort(function (a, b) { return a.y - b.y; });
+    for (var k = 1; k < labs.length; k++) if (labs[k].y - labs[k - 1].y < 14) labs[k].y = labs[k - 1].y + 14;
+    labs.forEach(function (l) {
+      s += '<text x="' + (W - m.r + 10) + '" y="' + (l.y + 4) + '" font-size="12" font-weight="600" style="fill:' + l.c + '">' + l.t + '</text>';
+    });
+    s += '</svg>';
+    box.innerHTML = s;
+  }
+
+  function update() {
+    var r = compute();
+    renderProfile(r);
+    renderAlloc(r);
+    renderProj(r);
+  }
+
+  $('lang-tr').addEventListener('click', function () { setLang('tr'); });
+  $('lang-en').addEventListener('click', function () { setLang('en'); });
+  document.addEventListener('input', update);
+  document.addEventListener('change', update);
+  if (window.ResizeObserver) new ResizeObserver(function () { drawChart(); }).observe($('chart'));
+  else window.addEventListener('resize', drawChart);
+
+  /* Renk paleti ve açık/koyu tema */
+  var PALETTES = ['teal', 'indigo', 'rose', 'graphite'];
+  var palette = 'teal', mode = null, root = document.documentElement;
+  try {
+    var sp = localStorage.getItem('oranla-palette'); if (PALETTES.indexOf(sp) > -1) palette = sp;
+    var sm = localStorage.getItem('oranla-mode'); if (sm === 'light' || sm === 'dark') mode = sm;
+  } catch (e) {}
+  function applyColors() {
+    if (palette === 'teal') root.removeAttribute('data-palette'); else root.setAttribute('data-palette', palette);
+    if (mode) root.setAttribute('data-theme', mode);
+    document.querySelectorAll('.sw').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-p') === palette ? 'true' : 'false'); });
+    var eff = root.getAttribute('data-theme') || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+    $('mode-light').setAttribute('aria-pressed', eff === 'light' ? 'true' : 'false');
+    $('mode-dark').setAttribute('aria-pressed', eff === 'dark' ? 'true' : 'false');
+  }
+  document.querySelectorAll('.sw').forEach(function (b) {
+    b.addEventListener('click', function () {
+      palette = b.getAttribute('data-p');
+      try { localStorage.setItem('oranla-palette', palette); } catch (e) {}
+      applyColors();
+    });
+  });
+  ['light', 'dark'].forEach(function (m) {
+    $('mode-' + m).addEventListener('click', function () {
+      mode = m;
+      try { localStorage.setItem('oranla-mode', m); } catch (e) {}
+      applyColors();
+    });
+  });
+
+  setFormats();
+  applyStatic();
+  applyColors();
+  update();
+})();
+</script>
+
+</body></html>
