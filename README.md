@@ -1,5 +1,5 @@
 # Robo-Finansal-Danışman
-# Oranla Robo Advisor / Oranla Robo Danışman
+# Robo Advisor / Robo Danışman
 
 [English](#english) · [Türkçe](#türkçe)
 
@@ -7,9 +7,8 @@
 
 ## English
 
-Oranla is a single-page robo advisor for Turkish savers. It asks six questions, assigns a risk profile, and suggests how to split money across term deposits, a money market fund, a debt instruments fund, an equity fund, gold, silver and foreign currency. It then projects three return scenarios over your investment horizon.
+Robo Danışman  is a single-page robo advisor for Turkish savers. It asks six questions, assigns a risk profile, and suggests how to split money across term deposits, a money market fund, a debt instruments fund, an equity fund, gold, silver and foreign currency. It then projects three return scenarios over your investment horizon.
 
-The name "Oranla" is a placeholder. Check it for trademark conflicts before public use.
 
 ### Features
 
@@ -65,9 +64,8 @@ This tool is for general information and education and is not investment advice.
 
 ## Türkçe
 
-Oranla, Türkiye'deki tasarruf sahipleri için hazırlanmış tek sayfalık bir robo danışmandır. Altı soru sorar, bir risk profili belirler ve parayı vadeli mevduat, para piyasası fonu, borçlanma araçları fonu, hisse senedi fonu, altın, gümüş ve döviz arasında nasıl paylaştırabileceğinizi önerir. Ardından yatırım sürenize göre üç getiri senaryosu gösterir.
+Robo Danışman, Türkiye'deki tasarruf sahipleri için hazırlanmış tek sayfalık bir robo danışmandır. Altı soru sorar, bir risk profili belirler ve parayı vadeli mevduat, para piyasası fonu, borçlanma araçları fonu, hisse senedi fonu, altın, gümüş ve döviz arasında nasıl paylaştırabileceğinizi önerir. Ardından yatırım sürenize göre üç getiri senaryosu gösterir.
 
-"Oranla" adı geçicidir. Herkese açık kullanımdan önce marka çakışması açısından kontrol edin.
 
 ### Özellikler
 
